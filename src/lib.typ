@@ -1,4 +1,4 @@
-#import "model.typ": node, edge, cut, cycle
+#import "model.typ": node, cut, cycle
 #import "dsl.typ": tree
 #import "render.typ": draw
 #import "validate.typ": validate

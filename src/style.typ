@@ -18,7 +18,7 @@
     stolon: (
       shape: "stolon",
       stroke: black + 0.5pt,
-      stolon-gap: 2pt,
+      stolon-gap: 0.8pt,
     ),
   ),
   cycle-style: (
@@ -31,8 +31,8 @@
   ann-size: auto,
   ann-dx: 6pt,
   ann-dy: 2pt,
-  x-gap: 14pt,
-  y-gap: 10pt,
+  x-gap: 10pt,
+  y-gap: 8pt,
   inline-baseline: 25%,
 )
 

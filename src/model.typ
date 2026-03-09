@@ -13,6 +13,21 @@
   }
 }
 
+#let _validate-level-shift(level-shift) = {
+  if level-shift == auto {
+    auto
+  } else if type(level-shift) == int and level-shift >= 0 {
+    level-shift
+  } else {
+    panic("node(level-shift: ...) must be auto or a non-negative integer, got " + repr(level-shift))
+  }
+}
+
+#let _resolved-level-shift(level-shift) = {
+  let shift = _validate-level-shift(level-shift)
+  if shift == auto { 1 } else { shift }
+}
+
 #let node(
   label: none,
   id: auto,
@@ -20,35 +35,23 @@
   stroke: auto,
   ann: none,
   children: (),
-  ..meta,
-) = (
-  _kind: "node",
-  id: id,
-  label: label,
-  fill: fill,
-  stroke: stroke,
-  ann: ann,
-  children: children,
-  meta: _meta(meta),
-)
-
-#let edge(
-  to: none,
-  kind: "branch",
-  id: auto,
-  style: (),
+  edge-kind: "branch",
+  edge-style: (),
+  level-shift: auto,
   ..meta,
 ) = {
-  if to == none { panic("edge(...) requires `to:`") }
-  if kind == "loop" {
-    panic("edge(kind: \"loop\", ...) was removed; use cycle(...)+tree(cycles: (...))")
-  }
+  let validated-level-shift = _validate-level-shift(level-shift)
   (
-    _kind: "edge",
+    _kind: "node",
     id: id,
-    to: to,
-    edge-kind: kind,
-    style: style,
+    label: label,
+    fill: fill,
+    stroke: stroke,
+    ann: ann,
+    children: children,
+    edge-kind: edge-kind,
+    edge-style: edge-style,
+    "level-shift": validated-level-shift,
     meta: _meta(meta),
   )
 }
@@ -97,7 +100,7 @@
     let s = acc.at(1)
 
     if type(child) != dictionary {
-      panic("node children must be node(...) or edge(...) values")
+      panic("node children must be node(...) values")
     }
 
     let child-kind = child.at("_kind", default: none)
@@ -115,38 +118,15 @@
           _kind: "edge",
           id: edge-id,
           to: child-node,
-          edge-kind: "branch",
-          style: (),
+          edge-kind: child.at("edge-kind", default: "branch"),
+          "level-shift": _validate-level-shift(child.at("level-shift", default: auto)),
+          style: child.at("edge-style", default: ()),
           meta: (),
         ),),
         s3,
       )
-    } else if child-kind == "edge" {
-      if type(child.to) != dictionary or child.to.at("_kind", default: none) != "node" {
-        panic("edge(to: ...) must reference a node(...) value")
-      }
-
-      let edge-id-out = _resolve-id(child.id, s, "edge", "e")
-      let edge-id = edge-id-out.at(0)
-      let s2 = edge-id-out.at(1)
-
-      let to-out = _normalize-node(child.to, s2)
-      let to-node = to-out.at(0)
-      let s3 = to-out.at(1)
-
-      (
-        edges + ((
-          _kind: "edge",
-          id: edge-id,
-          to: to-node,
-          edge-kind: child.at("edge-kind", default: "branch"),
-          style: child.style,
-          meta: child.meta,
-        ),),
-        s3,
-      )
     } else {
-      panic("node children must be node(...) or edge(...) values")
+      panic("node children must be node(...) values")
     }
   })
 
@@ -158,6 +138,9 @@
     stroke: n.stroke,
     ann: n.ann,
     children: folded.at(0),
+    edge-kind: n.at("edge-kind", default: "branch"),
+    edge-style: n.at("edge-style", default: ()),
+    "level-shift": _validate-level-shift(n.at("level-shift", default: auto)),
     meta: n.meta,
   ), folded.at(1))
 }
@@ -249,6 +232,7 @@
         from: parent-id,
         to: first.to.id,
         edge-kind: first.at("edge-kind", default: "branch"),
+        "level-shift": first.at("level-shift", default: auto),
       ),
     )
 
@@ -261,7 +245,9 @@
 
 #let _node-index(node, idx: (:), depth: 0) = {
   let with-current = idx + ((node.id): (node: node, depth: depth))
-  node.children.fold(with-current, (acc, e) => _node-index(e.to, idx: acc, depth: depth + 1))
+  node.children.fold(with-current, (acc, e) => {
+    _node-index(e.to, idx: acc, depth: depth + _resolved-level-shift(e.at("level-shift", default: auto)))
+  })
 }
 
 #let node-index(t) = _node-index(t.root, idx: (:), depth: 0)

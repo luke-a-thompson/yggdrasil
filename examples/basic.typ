@@ -1,4 +1,4 @@
-#import "../src/lib.typ": cut, cycle, draw, edge, node, tree
+#import "../src/lib.typ": cut, cycle, draw, node, tree
 
 #set page(width: auto, height: auto, margin: 8pt)
 #show link: underline
@@ -51,16 +51,28 @@ Trees can be cut $ #draw(cut_cherry) = $.
 
 #v(20pt)
 
-#let aromatic_cherry = tree(
-  kind: "aromatic",
+#let aromatic_tree1 = tree(
+  kind: "exotic-aromatic",
   root: node($r$, id: "r", children: (
+    node($r_2$, id: "r2", level-shift: 0),
     node($a$, id: "a"),
     node($b$, id: "b"),
   )),
-  cycles: (cycle(nodes: ("a", "b")),),
+  cycles: (cycle(nodes: ("r", "r2")),),
 )
 
-Some trees smell particularly good, like this #emph("aromatic tree") $ #draw(aromatic_cherry) $.
+#let aromatic_tree2 = tree(
+  kind: "exotic-aromatic",
+  root: node($r$, id: "r", children: (
+    node($r_2$, id: "r2"),
+    node($a$, id: "a"),
+    node($b$, id: "b", children: (
+      node($c$, id: "c"),
+    )),
+  )),
+)
+
+Some trees smell particularly good, like the #emph("aromatic trees") $ #draw(aromatic_tree1), space #draw(aromatic_tree2) $.
 
 For more exotic problems, we have the #emph("exotic aromatic") trees,
 
@@ -70,7 +82,7 @@ For more exotic problems, we have the #emph("exotic aromatic") trees,
     node($a$, id: "a"),
     node($b$, id: "b"),
   )),
-  cycles: (cycle(nodes: ("a")),),
+  cycles: (cycle(nodes: "r"),),
 )
 
 $ #draw(exotic_aromatic_cherry) $

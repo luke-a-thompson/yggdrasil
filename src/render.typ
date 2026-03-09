@@ -63,10 +63,28 @@
   if shape == "branch" or shape == "liana" {
     cdraw.line(p1, p2, stroke: stroke)
   } else if shape == "stolon" {
-    let gap = resolved.at("stolon-gap", default: 2pt)
+    let gap = resolved.at("stolon-gap", default: 3pt)
     let half = gap / 2
-    cdraw.line((p1.at(0), p1.at(1) - half), (p2.at(0), p2.at(1) - half), stroke: stroke)
-    cdraw.line((p1.at(0), p1.at(1) + half), (p2.at(0), p2.at(1) + half), stroke: stroke)
+    let dx = p2.at(0) - p1.at(0)
+    let dy = p2.at(1) - p1.at(1)
+    let len = calc.sqrt((dx / 1pt) * (dx / 1pt) + (dy / 1pt) * (dy / 1pt)) * 1pt
+
+    if len == 0pt {
+      cdraw.line(p1, p2, stroke: stroke)
+      return
+    }
+
+    // Offset along the edge normal so stolon renders as two parallel lines.
+    let nx = -dy / len
+    let ny = dx / len
+
+    let p1a = (p1.at(0) + nx * half, p1.at(1) + ny * half)
+    let p2a = (p2.at(0) + nx * half, p2.at(1) + ny * half)
+    let p1b = (p1.at(0) - nx * half, p1.at(1) - ny * half)
+    let p2b = (p2.at(0) - nx * half, p2.at(1) - ny * half)
+
+    cdraw.line(p1a, p2a, stroke: stroke)
+    cdraw.line(p1b, p2b, stroke: stroke)
   } else {
     panic("Unknown edge shape: " + repr(shape) + ". Supported shapes: (\"branch\", \"liana\", \"stolon\")")
   }
@@ -89,9 +107,12 @@
 #let _resolve-cycle-style(c, style) = {
   let base = style.at("cycle-style", default: (:))
   (
-    stroke: base.at("stroke", default: style.at("edge-stroke")),
-    "side-radius": base.at("side-radius", default: 2.4pt),
-  ) + _as-dict(c.style)
+    (
+      stroke: base.at("stroke", default: style.at("edge-stroke")),
+      "side-radius": base.at("side-radius", default: 2.4pt),
+    )
+      + _as-dict(c.style)
+  )
 }
 
 #let _cycle-rails-y(node-y, style) = {
@@ -103,8 +124,8 @@
   let rails = _cycle-rails-y(node.y, style)
   let top-y = rails.top
   let bottom-y = rails.bottom
-  let cy = (top-y + bottom-y) / 2
   let rr = calc.abs(bottom-y - top-y)
+  let cy = (top-y + bottom-y) / 2
   cdraw.arc(
     (node.x, cy),
     radius: (rr, rr),

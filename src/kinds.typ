@@ -1,7 +1,7 @@
 #let kind-specs = (
   rooted: (
     allow-cycles: false,
-    planar: true,
+    planar: false,
     allowed-edge-kinds: ("branch",),
     require-typed-decoration: false,
   ),

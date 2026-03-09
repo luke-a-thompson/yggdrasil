@@ -1,5 +1,15 @@
 #import "style.typ": default-style, merge-style
 
+#let _resolved-level-shift(level-shift) = {
+  if level-shift == auto {
+    1
+  } else if type(level-shift) == int and level-shift >= 0 {
+    level-shift
+  } else {
+    panic("node(level-shift: ...) must be auto or a non-negative integer")
+  }
+}
+
 #let _leaf-count(node) = {
   if node.children.len() == 0 {
     1
@@ -8,12 +18,8 @@
   }
 }
 
-#let _max-depth(node) = {
-  if node.children.len() == 0 {
-    0
-  } else {
-    1 + node.children.fold(0, (m, e) => calc.max(m, _max-depth(e.to)))
-  }
+#let _max-y(node) = {
+  node.children.fold(node.y, (m, e) => calc.max(m, _max-y(e.to)))
 }
 
 #let _place-node(node, depth: 0, x-center: 0pt, style: ()) = {
@@ -29,11 +35,13 @@
     let subtree-width = subtree-leaves * style.at("x-gap")
     let child-center = cursor + subtree-width / 2
 
-    let placed-child = _place-node(e.to, depth: depth + 1, x-center: child-center, style: style)
+    let shift = _resolved-level-shift(e.at("level-shift", default: auto))
+    let placed-child = _place-node(e.to, depth: depth + shift, x-center: child-center, style: style)
     (
       placed + ((
         id: e.id,
         edge-kind: e.at("edge-kind", default: "branch"),
+        "level-shift": e.at("level-shift", default: auto),
         style: e.style,
         meta: e.meta,
         to: placed-child,
@@ -69,6 +77,6 @@
     style: used-style,
     mode: mode,
     width: root-leaves * used-style.at("x-gap"),
-    height: (1 + _max-depth(placed-root)) * used-style.at("y-gap"),
+    height: _max-y(placed-root) + used-style.at("y-gap"),
   )
 }
