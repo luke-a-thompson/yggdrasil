@@ -55,7 +55,6 @@
     label: node.label,
     fill: node.fill,
     stroke: node.stroke,
-    ann: node.ann,
     meta: node.meta,
     x: x-center,
     y: y,

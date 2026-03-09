@@ -29,17 +29,19 @@
 }
 
 #let node(
+  id,
   label: none,
-  id: auto,
   fill: none,
   stroke: auto,
-  ann: none,
   children: (),
   edge-kind: "branch",
   edge-style: (),
   level-shift: auto,
   ..meta,
 ) = {
+  if id != auto and type(id) != str {
+    panic("node(id, label, ...) expects id as str (or auto); use node(auto, label, ...) if you only set a label")
+  }
   let validated-level-shift = _validate-level-shift(level-shift)
   (
     _kind: "node",
@@ -47,7 +49,6 @@
     label: label,
     fill: fill,
     stroke: stroke,
-    ann: ann,
     children: children,
     edge-kind: edge-kind,
     edge-style: edge-style,
@@ -136,7 +137,6 @@
     label: n.label,
     fill: n.fill,
     stroke: n.stroke,
-    ann: n.ann,
     children: folded.at(0),
     edge-kind: n.at("edge-kind", default: "branch"),
     edge-style: n.at("edge-style", default: ()),

@@ -173,50 +173,6 @@
   cdraw.line((left.x, bottom-line-y), (right.x, bottom-line-y), stroke: resolved.at("stroke"))
 }
 
-#let _ann-content(ann) = {
-  if type(ann) != str {
-    ann
-  } else {
-    let greek = (
-      "alpha": "α",
-      "beta": "β",
-      "gamma": "γ",
-      "delta": "δ",
-      "epsilon": "ε",
-      "zeta": "ζ",
-      "eta": "η",
-      "theta": "θ",
-      "iota": "ι",
-      "kappa": "κ",
-      "lambda": "λ",
-      "mu": "μ",
-      "nu": "ν",
-      "xi": "ξ",
-      "pi": "π",
-      "rho": "ρ",
-      "sigma": "σ",
-      "tau": "τ",
-      "upsilon": "υ",
-      "phi": "φ",
-      "chi": "χ",
-      "psi": "ψ",
-      "omega": "ω",
-      "Gamma": "Γ",
-      "Delta": "Δ",
-      "Theta": "Θ",
-      "Lambda": "Λ",
-      "Xi": "Ξ",
-      "Pi": "Π",
-      "Sigma": "Σ",
-      "Upsilon": "Υ",
-      "Phi": "Φ",
-      "Psi": "Ψ",
-      "Omega": "Ω",
-    )
-    greek.at(ann, default: ann)
-  }
-}
-
 #let _draw-node(n, style) = {
   let fill = if n.fill == none { style.at("node-fill") } else { n.fill }
   let stroke = if n.stroke == auto { style.at("node-stroke") } else { n.stroke }
@@ -227,14 +183,6 @@
     cdraw.content(
       (n.x + style.at("label-dx", default: 0pt), n.y + style.at("label-dy", default: 0pt)),
       text(size: style.at("label-size", default: 6pt), n.label),
-    )
-  }
-  if n.ann != none {
-    let ann-size = style.at("ann-size", default: auto)
-    let ann-content = _ann-content(n.ann)
-    cdraw.content(
-      (n.x + style.at("ann-dx"), n.y + style.at("ann-dy")),
-      if ann-size == auto { ann-content } else { text(size: ann-size, ann-content) },
     )
   }
 }

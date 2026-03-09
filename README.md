@@ -4,7 +4,7 @@ Typst package for mathematical rooted trees with validation by tree kind.
 
 ## API
 
-- `node(..., edge-kind: "branch" | "liana" | "stolon", edge-style: (), level-shift: auto | 0 | 1 | ...)`
+- `node(id, label, ..., edge-kind: "branch" | "liana" | "stolon", edge-style: (), level-shift: auto | 0 | 1 | ...)` (`id` is required; use `auto`)
 - `cycle(nodes: ..., style: ...)`
 - `cut(edges: ..., kind: "admissible" | "arbitrary")`
 - `tree(root: ..., kind: ..., cuts: (...), cycles: (...))`
@@ -29,9 +29,9 @@ Kinds are subtypes via validation rules on one shared core model.
 
 #let t = tree(
   kind: "aromatic",
-  root: node($r$, id: "r", children: (
-    node($a$, id: "a", ann: $gamma$, edge-kind: "branch", level-shift: 0),
-    node($b$, id: "b"),
+  root: node("r", $r$, children: (
+    node("a", $a$, edge-kind: "branch", level-shift: 0),
+    node("b", $b$),
   )),
   cuts: (cut(edges: ("e0",), kind: "admissible"),),
   cycles: (cycle(nodes: ("a", "b")),),

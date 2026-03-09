@@ -7,17 +7,17 @@ Consider an ODE $dif/(dif t) = f(y(t))$.
 
 #let cherry = tree(
   kind: "rooted",
-  root: node($r$, children: (
-    node($a$),
-    node($b$),
+  root: node(auto, $r$, children: (
+    node(auto, $a$),
+    node(auto, $b$),
   )),
 )
 
 #let ladderThree = tree(
   kind: "rooted",
-  root: node($r$, children: (
-    node($a$, children: (
-      node($b$),
+  root: node(auto, $r$, children: (
+    node(auto, $a$, children: (
+      node(auto, $b$),
     )),
   )),
 )
@@ -28,9 +28,9 @@ $ draw(ladderThree), space draw(cherry). $
 
 #let planar_cherry = tree(
   kind: "planar",
-  root: node($r$, children: (
-    node($a$),
-    node($b$),
+  root: node(auto, $r$, children: (
+    node(auto, $a$),
+    node(auto, $b$),
   )),
 )
 If this ODE is posed on a manifold, we can use planar rooted rooted trees where $#draw(planar_cherry) != #draw(planar_cherry)$.
@@ -39,9 +39,9 @@ If this ODE is posed on a manifold, we can use planar rooted rooted trees where 
 
 #let cut_cherry = tree(
   kind: "rooted",
-  root: node($r$, children: (
-    node($a$),
-    node($b$),
+  root: node(auto, $r$, children: (
+    node(auto, $a$),
+    node(auto, $b$),
   )),
   cuts: (cut(edges: ("e0",), kind: "admissible"),),
 )
@@ -53,21 +53,21 @@ Trees can be cut $ #draw(cut_cherry) = $.
 
 #let aromatic_tree1 = tree(
   kind: "exotic-aromatic",
-  root: node($r$, id: "r", children: (
-    node($r_2$, id: "r2", level-shift: 0),
-    node($a$, id: "a"),
-    node($b$, id: "b"),
+  root: node("r", $r$, children: (
+    node("r2", $r_2$, level-shift: 0),
+    node("a", $a$),
+    node("b", $b$),
   )),
   cycles: (cycle(nodes: ("r", "r2")),),
 )
 
 #let aromatic_tree2 = tree(
   kind: "exotic-aromatic",
-  root: node($r$, id: "r", children: (
-    node($r_2$, id: "r2"),
-    node($a$, id: "a"),
-    node($b$, id: "b", children: (
-      node($c$, id: "c"),
+  root: node("r", $r$, children: (
+    node("r2", $r_2$),
+    node("a", $b$),
+    node("b", $b$, children: (
+      node("c", $c$),
     )),
   )),
 )
@@ -78,9 +78,9 @@ For more exotic problems, we have the #emph("exotic aromatic") trees,
 
 #let exotic_aromatic_cherry = tree(
   kind: "exotic-aromatic",
-  root: node($r$, id: "r", children: (
-    node($a$, id: "a"),
-    node($b$, id: "b"),
+  root: node("r", $r$, children: (
+    node("a", $a$),
+    node("b", $b$),
   )),
   cycles: (cycle(nodes: "r"),),
 )
